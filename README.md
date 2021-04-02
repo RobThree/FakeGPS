@@ -20,7 +20,7 @@ On first usage or when the module can't connect to the local WiFi-network it sta
 * A [Wemos D1 mini](https://www.aliexpress.com/item/32651747570.html)
 * A [3.5mm Stereo-plug with cable](https://www.aliexpress.com/item/4000341990326.html)
 
-![Wemos D1 mini]](WemosD1mini.jpg)
+![Wemos D1 mini]](pictures/WemosD1mini.jpg)
 
 The serial signal comes from pin TXD1 (GPIO2, D4) of the Wemos D1 mini with 9600 baud. Connect the audioplug to 5V, GND and signal [as described in the assembly instructions of the clock](pictures/manual_excerpt.png) and configure the timereceiver of the clock for GPS-Format and 9600 Baud (set parameter `12` to value `4` (GPS) and parameter `13` to `1` (9600 baud)).
 
