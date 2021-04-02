@@ -3,37 +3,31 @@
 Forked from https://github.com/xSnowHeadx/FakeGPS  
 
 ## Introduction
-The company [PV Electronics](https://www.pvelectronics.co.uk) from UK sells nice Nixie-clocks:
+The company [PV Electronics](https://www.pvelectronics.co.uk) from the UK sells nice Nixie-clocks:
 
 ![IN-8_Nixie-Clock](pictures/IN-8_Nixie-Clock.jpg)
 
-Unfortunately these clocks have only a crystal for time accuracy and no DST-automatic. To get the exact time you can buy a [NTP-client](https://www.pvelectronics.co.uk/index.php?main_page=product_info&cPath=10&products_id=188) from the same company for $40 or you make one by yourself for $2 and with better features. 
+Unfortunately these clocks only have a crystal oscillator to keep time but this isn't very accurate and it also doesn't provide automatic daylight savings changes. To get the exact time you can buy an [NTP-client](https://www.pvelectronics.co.uk/index.php?main_page=product_info&cPath=10&products_id=188) from the same company for $40 or... you make one by yourself for $3 with better features. 
 
 ## Function
-The FakeGPS requests the UTC-Time from a NTP-Server over WiFi and Internet and generates a GPRMC-Message in the GPS-Format NMEA-0183 as required from the Clock. Because the GPS-Time normally is UTC-time without localisation or DST-information the clock with original receiver has to be set in DST-mode manually on every DST-change. 
+The FakeGPS requests the UTC-Time from a NTP-Server over WiFi and internet and generates a GPRMC-Message in the GPS-Format NMEA-0183 as required by the Clock. Because GPS-Time normally is UTC-time without localisation or DST-information a clock with the original receiver has to be set in DST-mode manually on every DST-change. 
 
-This converter generates a timestamp in local time considering the DST-state. So the clock can be set on a UTC-difference of 0 and don't need any configuration or switching for DST on the clock. To calculate the correct local time it is necessary to configure the DST-rules at lines 24 and 26 in the file "fake_GPS.ino" according to your location and how described in the library [Timezone](https://github.com/JChristensen/Timezone). 
+This converter generates a timestamp in local time considering the DST-state. So the clock can be set on a UTC offset of 0 and doesn't need any configuration or switching to/from DST on the clock. To calculate the correct local time it is necessary to configure the DST-rules (see the `myDST` and `mySTD` variables in main.cpp) according to your location. How to do this is described in the library [Timezone](https://github.com/JChristensen/Timezone). 
 
-On first usage or when the module can't connect to the local WiFi-network it starts as accesspoint named "NixieAP". Connect to this AP and configure the SSID and Key of your local network as described [here](https://github.com/tzapu/WiFiManager). Then the module will connect to your network, act as NTP-server and keep the access-data for the next start.
+On first usage or when the module can't connect to the local WiFi-network it starts as accesspoint named "NixieAP". Connect to this AP and configure the SSID and password of your local network as described [here](https://github.com/tzapu/WiFiManager). The module will save your WiFi configuration and then connect to your network, query an NTP-server and update your clock at a regular interval.
 
 ## Hardware
-* We use a [Wemos D1 mini](https://www.aliexpress.com/item/32651747570.html). 
-* For the connection to the clock we only need one addtional part, a [3.5mm Stereo-plug](https://www.aliexpress.com/item/4000341990326.html) with cable like from old headphones.
+* A [Wemos D1 mini](https://www.aliexpress.com/item/32651747570.html)
+* A [3.5mm Stereo-plug with cable](https://www.aliexpress.com/item/4000341990326.html)
 
 ![Wemos D1 mini]](WemosD1mini.jpg)
 
-The serial signal comes from Pin TXD1 (GPIO2, D4) of the NodeMCU with 9600 baud. Connect the audioplug to 5V, GND and Signal as described in the assembly instructions of the clock and configure the timereceiver of the clock for GPS-Format and 9600 Baud.
+The serial signal comes from pin TXD1 (GPIO2, D4) of the Wemos D1 mini with 9600 baud. Connect the audioplug to 5V, GND and signal [as described in the assembly instructions of the clock](pictures/manual_excerpt.png) and configure the timereceiver of the clock for GPS-Format and 9600 Baud (set parameter `12` to value `4` (GPS) and parameter `13` to `1` (9600 baud)).
 
-For a case there is a [minimalistic type](https://www.thingiverse.com/thing:2764626) sufficient:
+If you like to put your Wemos D1 mini in a case there is a [minimalistic one](https://www.thingiverse.com/thing:2764626) available at Thingyverse.
 
 
-![FakeGPS Case](pictures/FakeGPS_Case.jpg)
+![Thinyverse Wemos D1 mini case](pictures/FakeGPS_Case.jpg)
  
 ## Software
-Because the Wemos D1 mini is Arduino-compatible it can be programmed with any IDE for Arduino.
-
-##### Special libraries
-* [NTPClient](https://github.com/arduino-libraries/NTPClient)
-* [Time](https://github.com/PaulStoffregen/Time)
-* [Timezone](https://github.com/JChristensen/Timezone)
-* [WiFiManager](https://github.com/tzapu/WiFiManager)
+Because the Wemos D1 mini is Arduino-compatible it can be programmed with any IDE for Arduino; this project is intended for [PlatformIO](https://platformio.org/).
