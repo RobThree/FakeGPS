@@ -11,31 +11,32 @@ extern "C"
 #include <WiFiManager.h>          // https://github.com/tzapu/WiFiManager
 #include <NTPClient.h>			  // https://github.com/arduino-libraries/NTPClient
 #include <Timezone.h>    		  // https://github.com/JChristensen/Timezone
+#include <config.h>
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP);
+NTPClient timeClient(ntpUDP, NTP_SERVER, 0, NTP_INTERVAL);
 WiFiManager wifiManager;
 
 int firstrun = 1;
 
 // Configure your timezone rules here how described on https://github.com/JChristensen/Timezone
-TimeChangeRule myDST = { "CEST", Last, Sun, Mar, 2, +120 };    //Daylight time = UTC + 2 hours
-TimeChangeRule mySTD = { "CET", Last, Sun, Oct, 2, +60 };      //Standard time = UTC + 1 hours
-Timezone myTZ(myDST, mySTD);
+TimeChangeRule tzDST = TZ_DST;
+TimeChangeRule tzSTD = TZ_STD;
+Timezone tzClock(tzDST, tzSTD);
 
 void setup()
 {
 	pinMode(LED_BUILTIN, OUTPUT);   // Initialize the LED_BUILTIN pin as an output
 	digitalWrite(LED_BUILTIN, HIGH);
-	Serial.begin(115200);
+	Serial.begin(DEBUG_SERIAL);
 
 	wifiManager.setTimeout(180);
 
 	// Fetches ssid and pass and tries to connect
-	// If it does not connect it starts an access point with the specified name here "NixieAP"
+	// If it does not connect it starts an access point with the specified name
 	// And goes into a blocking loop awaiting configuration
 
-	if (!wifiManager.autoConnect("NixieAP"))
+	if (!wifiManager.autoConnect(AP_NAME))
 	{
 		Serial.println("Failed to connect; timed out");
 		delay(3000);
@@ -47,7 +48,7 @@ void setup()
 	// If we get here you have connected to the WiFi
 	Serial.println("Connected!");
 
-	Serial1.begin(9600);
+	Serial1.begin(CLOCK_SERIAL);
 
 	timeClient.update();
 }
@@ -67,7 +68,7 @@ void loop()
 		{
 			umicros = amicros;
 			rawtime = timeClient.getEpochTime();		// Get NTP-time
-			loctime = myTZ.toLocal(rawtime);			// Calc local time
+			loctime = tzClock.toLocal(rawtime);			// Calc local time
 
 			if ((!second(loctime)) || firstrun)			// Full minute or first cycle
 			{
@@ -78,7 +79,7 @@ void loop()
 				for (i = 1; i < strlen(tstr); i++)		// Calculate checksum
 					cs ^= tstr[i];
 				sprintf(tstr + strlen(tstr), "*%02X", cs);
-				Serial.println(tstr);					// Send to console
+				Serial.println(tstr);					// Send to debug
 				Serial1.println(tstr);					// Send to clock
 				delay(100);
 				digitalWrite(LED_BUILTIN, LOW);
