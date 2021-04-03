@@ -14,7 +14,7 @@ The FakeGPS requests the UTC-Time from a NTP-Server over WiFi and internet and g
 
 This converter generates a timestamp in local time considering the DST-state. So the clock can be set on a UTC offset of 0 and doesn't need any configuration or switching to/from DST on the clock. To calculate the correct local time it is necessary to configure the DST-rules (see the `myDST` and `mySTD` variables in main.cpp) according to your location. How to do this is described in the library [Timezone](https://github.com/JChristensen/Timezone). 
 
-On first usage or when the module can't connect to the local WiFi-network it starts as accesspoint named "NixieAP". Connect to this AP and configure the SSID and password of your local network as described [here](https://github.com/tzapu/WiFiManager). The module will save your WiFi configuration and then connect to your network, query an NTP-server and update your clock at a regular interval.
+On first usage or when the module can't connect to the local WiFi-network it starts as accesspoint named "NixieAP" (see `include/example_config.h` or `include/config.h` for a possibly changed name). Connect to this AP and configure the SSID and password of your local network as described [here](https://github.com/tzapu/WiFiManager). The module will save your WiFi configuration and then connect to your network, query the configured NTP-server and update your clock at a regular interval.
 
 ## Hardware
 * A [Wemos D1 mini](https://www.aliexpress.com/item/32651747570.html)
@@ -31,3 +31,5 @@ If you like to put your Wemos D1 mini in a case there is a [minimalistic one](ht
  
 ## Software
 Because the Wemos D1 mini is Arduino-compatible it can be programmed with any IDE for Arduino; this project is intended for [PlatformIO](https://platformio.org/).
+
+To get started, copy `include/example_config.h` to `include/config.h`, adjust any values to your need and then compile and upload.
